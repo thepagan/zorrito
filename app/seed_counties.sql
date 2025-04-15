@@ -857,7 +857,7 @@ INSERT INTO county (fips, county_name, state) VALUES (19133, 'Monona County', 'I
 INSERT INTO county (fips, county_name, state) VALUES (19135, 'Monroe County', 'IA');
 INSERT INTO county (fips, county_name, state) VALUES (19137, 'Montgomery County', 'IA');
 INSERT INTO county (fips, county_name, state) VALUES (19139, 'Muscatine County', 'IA');
-INSERT INTO county (fips, county_name, state) VALUES (19141, 'O'Brien County', 'IA');
+INSERT INTO county (fips, county_name, state) VALUES (19141, 'O''Brien County', 'IA');
 INSERT INTO county (fips, county_name, state) VALUES (19143, 'Osceola County', 'IA');
 INSERT INTO county (fips, county_name, state) VALUES (19145, 'Page County', 'IA');
 INSERT INTO county (fips, county_name, state) VALUES (19147, 'Palo Alto County', 'IA');
@@ -1206,9 +1206,9 @@ INSERT INTO county (fips, county_name, state) VALUES (24025, 'Harford County', '
 INSERT INTO county (fips, county_name, state) VALUES (24027, 'Howard County', 'MD');
 INSERT INTO county (fips, county_name, state) VALUES (24029, 'Kent County', 'MD');
 INSERT INTO county (fips, county_name, state) VALUES (24031, 'Montgomery County', 'MD');
-INSERT INTO county (fips, county_name, state) VALUES (24033, 'Prince George's County', 'MD');
-INSERT INTO county (fips, county_name, state) VALUES (24035, 'Queen Anne's County', 'MD');
-INSERT INTO county (fips, county_name, state) VALUES (24037, 'St. Mary's County', 'MD');
+INSERT INTO county (fips, county_name, state) VALUES (24033, 'Prince George''s County', 'MD');
+INSERT INTO county (fips, county_name, state) VALUES (24035, 'Queen Anne''s County', 'MD');
+INSERT INTO county (fips, county_name, state) VALUES (24037, 'St. Mary''s County', 'MD');
 INSERT INTO county (fips, county_name, state) VALUES (24039, 'Somerset County', 'MD');
 INSERT INTO county (fips, county_name, state) VALUES (24041, 'Talbot County', 'MD');
 INSERT INTO county (fips, county_name, state) VALUES (24043, 'Washington County', 'MD');

@@ -48,10 +48,17 @@ def setup_database_with_retry(retries=5, delay=2):
             try:
                 conn = psycopg2.connect("dbname='zorrito' user='zorrito' host='db' password='password'")
                 cur = conn.cursor()
-                for sql_file in ["schema.sql", "seed_counties.sql", "seed_states.sql"]:
-                    if os.path.exists(sql_file):
-                        with open(sql_file, "r") as f:
+                if os.path.exists("schema.sql"):
+                    with open("schema.sql", "r") as f:
+                        cur.execute(f.read())
+
+                if os.path.exists("seed_counties.sql"):
+                    cur.execute("SELECT COUNT(*) FROM county")
+                    county_count = cur.fetchone()[0]
+                    if county_count == 0:
+                        with open("seed_counties.sql", "r") as f:
                             cur.execute(f.read())
+
                 conn.commit()
                 cur.close()
                 conn.close()

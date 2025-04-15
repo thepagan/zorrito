@@ -3,18 +3,11 @@
   --bg-color: #ffffff;
   --text-color: #111111;
   --accent-color: #007bff;
-}
-
-:root[data-theme="light"] {
-  --bg-color: #ffffff;
-  --text-color: #111111;
-  --accent-color: #007bff;
-}
-
-:root[data-theme="dark"] {
-  --bg-color: #121212;
-  --text-color: #f1f1f1;
-  --accent-color: #66aaff;
+  --form-bg: #f9f9f9;
+  --input-bg: #ffffff;
+  --input-border: #ccc;
+  --btn-bg: #0d6efd;
+  --btn-text: #ffffff;
 }
 
 :root[data-theme="dark"] {
@@ -24,16 +17,6 @@
   --input-bg: #2a2a2a;
   --input-border: #555;
   --btn-bg: #3b82f6;
-  --btn-text: #ffffff;
-}
-
-:root[data-theme="light"] {
-  --bg-color: #ffffff;
-  --text-color: #111111;
-  --form-bg: #f9f9f9;
-  --input-bg: #ffffff;
-  --input-border: #ccc;
-  --btn-bg: #0d6efd;
   --btn-text: #ffffff;
 }
 
@@ -87,4 +70,50 @@ body {
 
 a {
   color: var(--accent-color);
+}
+
+.form-select option {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+}
+
+:root[data-theme="dark"] .form-select:focus,
+:root[data-theme="dark"] .form-control:focus,
+:root[data-theme="dark"] .form-check-input:focus {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--accent-color);
+  outline: none;
+}
+
+:root[data-theme="dark"] input::selection,
+:root[data-theme="dark"] textarea::selection {
+  background: var(--accent-color);
+  color: var(--btn-text);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--accent-color);
+  outline: 2px solid var(--accent-color);
+}
+
+input,
+select,
+textarea {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border-color: var(--accent-color);
+  outline: 2px solid var(--accent-color);
 }
