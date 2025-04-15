@@ -5,6 +5,7 @@ import sqlalchemy.exc
 from twilio.rest import Client
 import logging
 from registration_languages import registration_translations
+import psycopg2
 
 # Set up logging to /app/zorrito.log
 log_path = "/app/zorrito.log"
@@ -41,13 +42,22 @@ def setup_database_with_retry(retries=5, delay=2):
     for attempt in range(retries):
         try:
             db.create_all()
-            if County.query.count() == 0:
-                with open("counties.csv") as f:
-                    reader = csv.DictReader(f)
-                    for row in reader:
-                        county = County(county_name=row["county_name"], state=row["state"], fips=row["fips"])
-                        db.session.add(county)
-                db.session.commit()
+
+            import psycopg2
+
+            try:
+                conn = psycopg2.connect("dbname='zorrito' user='zorrito' host='db' password='password'")
+                cur = conn.cursor()
+                for sql_file in ["schema.sql", "seed_counties.sql", "seed_states.sql"]:
+                    if os.path.exists(sql_file):
+                        with open(sql_file, "r") as f:
+                            cur.execute(f.read())
+                conn.commit()
+                cur.close()
+                conn.close()
+            except Exception as e:
+                print(f"[Zorrito] Failed to initialize from SQL files: {e}")
+
             break
         except sqlalchemy.exc.OperationalError as e:
             print(f"[Zorrito] Database not ready yet... retrying ({attempt + 1}/{retries})")
@@ -57,7 +67,7 @@ def setup_database_with_retry(retries=5, delay=2):
 
 @app.route("/", methods=["GET", "POST"])
 def register():
-    states = sorted(set(c.state for c in County.query.all()))
+    states = sorted(s[0] for s in db.session.query(db.func.distinct(County.state)).all())
     if request.method == "POST":
         phone = request.form.get("phone_number")
         fips = request.form.get("fips")
