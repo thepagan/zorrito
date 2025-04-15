@@ -2,4 +2,6 @@ Flask
 Flask-SQLAlchemy
 psycopg2-binary
 twilio
-
+celery
+redis
+celery[redis]

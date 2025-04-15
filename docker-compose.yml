@@ -11,6 +11,7 @@ services:
       - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
       - TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER}
       - TWILIO_TEST_NUMBER=${TWILIO_TEST_NUMBER}
+      - CELERY_BROKER_URL=redis://redis:6379/0
 
   db:
     image: postgres:14
@@ -20,5 +21,29 @@ services:
       POSTGRES_DB: zorrito
     volumes:
       - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: ./app
+    command: celery -A celery_app.celery worker --loglevel=info
+    depends_on:
+      - web
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
+  beat:
+    build: ./app
+    command: celery -A celery_app.celery beat --loglevel=info
+    depends_on:
+      - web
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+
 volumes:
   pgdata:
