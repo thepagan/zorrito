@@ -1,0 +1,90 @@
+/* Base variables */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #111111;
+  --accent-color: #007bff;
+}
+
+:root[data-theme="light"] {
+  --bg-color: #ffffff;
+  --text-color: #111111;
+  --accent-color: #007bff;
+}
+
+:root[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: #f1f1f1;
+  --accent-color: #66aaff;
+}
+
+:root[data-theme="dark"] {
+  --bg-color: #121212;
+  --text-color: #f1f1f1;
+  --form-bg: #1f1f1f;
+  --input-bg: #2a2a2a;
+  --input-border: #555;
+  --btn-bg: #3b82f6;
+  --btn-text: #ffffff;
+}
+
+:root[data-theme="light"] {
+  --bg-color: #ffffff;
+  --text-color: #111111;
+  --form-bg: #f9f9f9;
+  --input-bg: #ffffff;
+  --input-border: #ccc;
+  --btn-bg: #0d6efd;
+  --btn-text: #ffffff;
+}
+
+body,
+.themed-form,
+.themed-input,
+.form-select,
+.form-control,
+.form-check-input,
+.btn-primary {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Form container styling */
+.themed-form {
+  background-color: var(--form-bg);
+  color: var(--text-color);
+}
+
+/* Input fields */
+.themed-input,
+.form-select,
+.form-control,
+.form-check-input {
+  background-color: var(--input-bg);
+  color: var(--text-color);
+  border: 1px solid var(--input-border);
+}
+
+.themed-input::placeholder {
+  color: var(--text-color);
+  opacity: 0.7;
+}
+
+/* Button styling */
+.btn-primary {
+  background-color: var(--btn-bg);
+  color: var(--btn-text);
+  border: none;
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+/* Apply theming */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+a {
+  color: var(--accent-color);
+}

@@ -1,4 +1,3 @@
-
 version: '3.9'
 services:
   web:
@@ -7,6 +6,12 @@ services:
       - "8181:8181"
     depends_on:
       - db
+    environment:
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
+      - TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER}
+      - TWILIO_TEST_NUMBER=${TWILIO_TEST_NUMBER}
+
   db:
     image: postgres:14
     environment:
