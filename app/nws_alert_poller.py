@@ -5,14 +5,23 @@ from datetime import datetime
 import psycopg2
 from dotenv import load_dotenv
 from celery import Celery
+from celery.schedules import crontab
 
 # Load environment variables
 load_dotenv()
 app = Celery("nws_alert_poller", broker=os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0"))
 
+app.conf.beat_schedule = {
+    "poll-nws-every-1-minute": {
+        "task": "nws_alert_poller.poll_nws_alerts",
+        "schedule": crontab(minute="*/1"),
+    },
+}
+app.conf.timezone = "UTC"
+
 # Logging setup
 logging.basicConfig(
-    filename=os.getenv("ZORRITO_ALERT_LOG", "zorrito_alerts.log"),
+    filename=os.getenv("ZORRITO_ALERT_LOG", "/tmp/zorrito_polling.log"),
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
