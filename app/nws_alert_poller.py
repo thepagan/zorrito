@@ -114,6 +114,7 @@ def poll_nws_alerts():
                     inserted += 1
             conn.commit()
             logging.info(f"Inserted {inserted} new alerts into database.")
+            logging.debug(f"Poll completed at {datetime.utcnow().isoformat()} with {inserted} inserts.")
     except Exception as e:
         logging.error(f"Error during database insert: {e}")
 
@@ -131,5 +132,6 @@ def refresh_user_alerts_view():
     try:
         with db_engine.begin() as conn:
             conn.execute(text("REFRESH MATERIALIZED VIEW CONCURRENTLY user_alerts_view"))
+            logging.info(f"user_alerts_view refreshed at {datetime.utcnow().isoformat()}")
     except Exception as e:
         logging.error(f"Failed to refresh materialized view: {e}")
