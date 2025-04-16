@@ -4,6 +4,9 @@ CREATE TABLE IF NOT EXISTS "user" (
     phone_number VARCHAR(15) NOT NULL,
     fips VARCHAR(5) NOT NULL,
     language VARCHAR(5) DEFAULT 'en',
+    CONSTRAINT chk_user_language CHECK (language IN (
+        'en', 'es', 'so', 'ar', 'mm', 'sw', 'fr', 'rw', 'vi', 'ne', 'te', 'tr', 'ps'
+    )),
     subscribed BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     sub_on TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -56,3 +59,47 @@ CREATE TABLE IF NOT EXISTS alert_delivery (
     status TEXT,
     PRIMARY KEY (user_id, alert_id)
 );
+
+-- Index to speed up searching for alerts by FIPS or ID
+CREATE INDEX IF NOT EXISTS idx_alert_fips_composite ON alert_fips(alert_id, fips);
+
+-- Index to speed up matching users to alerts by FIPS
+CREATE INDEX IF NOT EXISTS idx_user_fips ON "user"(fips);
+
+-- Index to improve performance of cleanup queries on expired alerts
+CREATE INDEX IF NOT EXISTS idx_alerts_expires ON alerts(expires);
+
+-- Index to improve lookup speed on delivery logs
+CREATE INDEX IF NOT EXISTS idx_alert_delivery_sent_at ON alert_delivery(sent_at);
+
+-- Constraint to ensure only specific severities are stored
+ALTER TABLE alerts
+ADD CONSTRAINT chk_alerts_severity
+CHECK (severity IN ('Moderate', 'Severe', 'Extreme'));
+
+-- Materialized view to speed up alert-to-user matching
+CREATE MATERIALIZED VIEW IF NOT EXISTS user_alerts_view AS
+SELECT
+    u.id AS user_id,
+    u.phone_number,
+    u.language,
+    a.id AS alert_id,
+    a.event,
+    a.headline,
+    a.description,
+    a.severity,
+    a.expires
+FROM "user" u
+JOIN alert_fips af ON u.fips = af.fips
+JOIN alerts a ON af.alert_id = a.id
+WHERE a.severity IN ('Moderate', 'Severe', 'Extreme');
+
+-- Index to speed up querying the materialized view by user_id
+CREATE INDEX IF NOT EXISTS idx_user_alerts_user_id ON user_alerts_view(user_id);
+
+-- Index to speed up querying the materialized view by alert_id
+CREATE INDEX IF NOT EXISTS idx_user_alerts_alert_id ON user_alerts_view(alert_id);
+
+-- Composite index for efficient matching of users and alerts
+CREATE UNIQUE INDEX IF NOT EXISTS user_alerts_view_id_idx
+ON user_alerts_view(user_id, alert_id);

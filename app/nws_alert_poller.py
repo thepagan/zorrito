@@ -4,8 +4,9 @@ import logging
 from datetime import datetime
 import psycopg2
 from dotenv import load_dotenv
-from celery import Celery
+from celery import Celery, shared_task
 from celery.schedules import crontab
+from sqlalchemy import create_engine, text
 
 # Load environment variables
 load_dotenv()
@@ -15,6 +16,10 @@ app.conf.beat_schedule = {
     "poll-nws-every-1-minute": {
         "task": "nws_alert_poller.poll_nws_alerts",
         "schedule": crontab(minute="*/1"),
+    },
+    "refresh-user-alerts-view-every-2-minutes": {
+        "task": "nws_alert_poller.refresh_user_alerts_view",
+        "schedule": crontab(minute="*/2"),
     },
 }
 app.conf.timezone = "UTC"
@@ -71,7 +76,7 @@ def poll_nws_alerts():
                 for feature in features:
                     props = feature.get("properties", {})
                     severity = props.get("severity")
-                    if severity not in {"Moderate", "Severe", "Extreme"}:
+                    if severity is None or severity.strip().title() not in {"Moderate", "Severe", "Extreme"}:
                         continue
 
                     alert_id = feature.get("id")
@@ -111,3 +116,20 @@ def poll_nws_alerts():
             logging.info(f"Inserted {inserted} new alerts into database.")
     except Exception as e:
         logging.error(f"Error during database insert: {e}")
+
+db_url = (
+    f"postgresql+psycopg2://{os.getenv('POSTGRES_USER', 'zorrito')}:"
+    f"{os.getenv('POSTGRES_PASSWORD', 'password')}@"
+    f"{os.getenv('POSTGRES_HOST', 'db')}:"
+    f"{os.getenv('POSTGRES_PORT', '5432')}/"
+    f"{os.getenv('POSTGRES_DB', 'zorrito')}"
+)
+db_engine = create_engine(db_url)
+
+@shared_task
+def refresh_user_alerts_view():
+    try:
+        with db_engine.begin() as conn:
+            conn.execute(text("REFRESH MATERIALIZED VIEW CONCURRENTLY user_alerts_view"))
+    except Exception as e:
+        logging.error(f"Failed to refresh materialized view: {e}")
