@@ -72,10 +72,20 @@ CREATE INDEX IF NOT EXISTS idx_alerts_expires ON alerts(expires);
 -- Index to improve lookup speed on delivery logs
 CREATE INDEX IF NOT EXISTS idx_alert_delivery_sent_at ON alert_delivery(sent_at);
 
--- Constraint to ensure only specific severities are stored
-ALTER TABLE alerts
-ADD CONSTRAINT chk_alerts_severity
-CHECK (severity IN ('Moderate', 'Severe', 'Extreme'));
+-- Safe conditional block to ensure only specific severities are stored
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint
+        WHERE conname = 'chk_alerts_severity'
+          AND conrelid = 'alerts'::regclass
+    ) THEN
+        ALTER TABLE alerts
+        ADD CONSTRAINT chk_alerts_severity
+        CHECK (severity IN ('Moderate', 'Severe', 'Extreme'));
+    END IF;
+END
+$$;
 
 -- Materialized view to speed up alert-to-user matching
 CREATE MATERIALIZED VIEW IF NOT EXISTS user_alerts_view AS

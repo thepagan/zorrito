@@ -17,6 +17,9 @@ logging.basicConfig(
 )
 logger = logging.getLogger("zorrito")
 
+def send_zorrito_alert(phone):
+    logger.info(f"📨 Simulated alert sent to {phone}")
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://zorrito:password@db:5432/zorrito'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -75,12 +78,14 @@ def setup_database_with_retry(retries=5, delay=2):
 @app.route("/", methods=["GET", "POST"])
 def register():
     states = sorted(s[0] for s in db.session.query(db.func.distinct(County.state)).all())
+    already_registered = False
     if request.method == "POST":
         phone = request.form.get("phone_number")
         fips = request.form.get("fips")
         language = request.form.get("language")
         subscribed = bool(request.form.get("subscribed"))
         existing_user = User.query.filter_by(phone_number=phone).first()
+        already_registered = existing_user is not None and existing_user.subscribed
         if existing_user:
             existing_user.fips = fips
             existing_user.language = language
@@ -104,7 +109,7 @@ def register():
         db.session.commit()
         send_zorrito_alert(phone)
         return redirect(url_for("thank_you", phone=phone))
-    return render_template("register.html", states=states)
+    return render_template("register.html", states=states, already_registered=already_registered)
 
 @app.route("/counties/<state>")
 def counties(state):
@@ -116,7 +121,10 @@ def thank_you():
     phone = request.args.get("phone")
     user = User.query.filter_by(phone_number=phone).order_by(User.created_at.desc()).first()
     lang = user.language if user else "en"
-    message = registration_translations.get(lang, registration_translations["en"])["thank_you"]
+    if user and not user.subscribed:
+        message = registration_translations.get(lang, registration_translations["en"])["unsubscribed"]
+    else:
+        message = registration_translations.get(lang, registration_translations["en"])["thank_you"]
     return f"<h1>{message}</h1>"
 
 @app.route("/send-test-alert")
@@ -124,20 +132,49 @@ def send_test_alert():
     send_zorrito_alert(os.getenv("TWILIO_TEST_NUMBER"))
     return "<h2>🦊 Zorrito envió una alerta de prueba por SMS.</h2>"
 
-def send_zorrito_alert(phone):
-    user = User.query.filter_by(phone_number=phone).order_by(User.created_at.desc()).first()
-    message = registration_translations.get(user.language, registration_translations["en"])
+@app.route("/sms-webhook", methods=["POST"])
+def sms_webhook():
+    from twilio.twiml.messaging_response import MessagingResponse
+    incoming_number = request.form.get("From")
+    incoming_body = request.form.get("Body", "").strip().lower()
 
-    try:
-        client = Client(os.getenv("TWILIO_ACCOUNT_SID"), os.getenv("TWILIO_AUTH_TOKEN"))
-        sent = client.messages.create(
-            body=message,
-            from_=os.getenv("TWILIO_FROM_NUMBER"),
-            to=phone
-        )
-        logger.info(f"✅ Alert sent to {phone}: SID {sent.sid}")
-    except Exception as e:
-        logger.error(f"❌ Failed to send alert to {phone}: {e}")
+    response = MessagingResponse()
+    user = User.query.filter_by(phone_number=incoming_number).order_by(User.created_at.desc()).first()
+
+    if user:
+        if incoming_body in ["stop", "unsubscribe", "cancel"]:
+            if user.subscribed:
+                user.subscribed = False
+                user.unsub_on = datetime.datetime.utcnow()
+                db.session.commit()
+                logger.info(f"📴 User {incoming_number} unsubscribed via SMS.")
+                response.message("🦊 You’ve been unsubscribed from Zorrito alerts. Reply START to rejoin.")
+            else:
+                response.message("🦊 You’re already unsubscribed from Zorrito alerts.")
+        elif incoming_body in ["start", "subscribe"]:
+            if not user.subscribed:
+                user.subscribed = True
+                user.sub_on = datetime.datetime.utcnow()
+                user.unsub_on = None
+                db.session.commit()
+                logger.info(f"📲 User {incoming_number} resubscribed via SMS.")
+                response.message("🦊 You’ve been resubscribed to Zorrito alerts.")
+            else:
+                response.message("🦊 You’re already subscribed to Zorrito alerts.")
+        else:
+            response.message("🦊 Reply STOP to unsubscribe or START to subscribe.")
+    else:
+        logger.warning(f"⚠️ Received SMS from unknown number {incoming_number}.")
+        response.message("🦊 Your number is not registered with Zorrito.")
+
+    return str(response)
+
+@app.route("/check-phone")
+def check_phone():
+    number = request.args.get("number")
+    user = User.query.filter_by(phone_number=number).first()
+    exists = user is not None and user.subscribed
+    return jsonify({ "exists": exists })
 
 if __name__ == "__main__":
     with app.app_context():

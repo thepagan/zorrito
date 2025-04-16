@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Registro de Zorrito</title>
+    <title data-i18n="page_title">Registro de Zorrito</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <script src="{{ url_for('static', filename='main.js') }}"></script>
@@ -18,9 +18,20 @@
         <div class="card-body">
             <h2 class="card-title text-center" data-i18n="title">🦊 Registro de Alertas</h2>
             <form method="POST">
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+                {% endif %}
+                {% if already_registered %}
+                <div class="alert alert-warning" role="alert" data-i18n="already_registered_msg">
+                    Este número ya está registrado. Puedes actualizar tus preferencias abajo o cancelar tu suscripción.
+                </div>
+                {% endif %}
                 <div class="mb-3">
                     <label for="phone_number" class="form-label" data-i18n="phone_label">Número de Teléfono</label>
-                    <input type="text" class="form-control themed-input" name="phone_number" required>
+                    <input type="text" class="form-control themed-input" name="phone_number" id="phone_number" required>
+                    <div id="phone-status" class="text-danger mt-1"></div>
                 </div>
                 <div class="mb-3">
                     <label for="state" class="form-label" data-i18n="state_label">Estado</label>
@@ -53,15 +64,136 @@
                     </select>
                 </div>
                 <div class="form-check mb-3">
-                    <input class="form-check-input themed-input" type="checkbox" value="1" name="subscribed" id="subscribed" checked>
+                    <input class="form-check-input themed-input" type="checkbox" value="1" name="subscribed" id="subscribed" {% if subscribed %}checked{% endif %}>
                     <label class="form-check-label" for="subscribed" data-i18n="subscribe_label">
                         Deseo recibir alertas
                     </label>
                 </div>
+                {% if already_registered %}
+                <button type="button" class="btn btn-danger w-100 mt-2" onclick="submitUnsubscribe()" data-i18n="unsubscribe_btn">
+                    Cancelar Suscripción
+                </button>
+                <form id="unsubscribe-form" method="POST" action="/unsubscribe" style="display: none;">
+                    <input type="hidden" name="phone_number" value="{{ phone_number }}">
+                </form>
+                <script>
+                    function submitUnsubscribe() {
+                        document.getElementById("unsubscribe-form").submit();
+                    }
+                </script>
+                {% endif %}
                 <button type="submit" class="btn btn-primary w-100" data-i18n="submit_btn">Registrarme</button>
             </form>
         </div>
     </div>
 </div>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const phoneInput = document.getElementById("phone_number");
+    const statusDiv = document.getElementById("phone-status");
+
+    const messages = {
+        en: "This phone number is already registered.",
+        es: "Este número de teléfono ya está registrado.",
+        so: "Lambarkan taleefanka horey ayaa loo diiwaan geliyay.",
+        ar: "رقم الهاتف هذا مسجل بالفعل.",
+        sw: "Nambari hii ya simu tayari imesajiliwa.",
+        fr: "Ce numéro de téléphone est déjà enregistré.",
+        rw: "Uyu mubare w’itumanaho waramaze kwiyandikwa.",
+        vi: "Số điện thoại này đã được đăng ký.",
+        ne: "यो फोन नम्बर पहिले नै दर्ता गरिएको छ।",
+        te: "ఈ ఫోన్ నంబర్ ఇప్పటికే నమోదుకు ఉంది.",
+        tr: "Bu telefon numarası zaten kayıtlı.",
+        ps: "دا د تلیفون شمېره مخکې ثبت شوې ده."
+    };
+
+    if (phoneInput) {
+        phoneInput.addEventListener("blur", function () {
+            const number = phoneInput.value;
+            const lang = document.getElementById("language")?.value || "en";
+            const subscribeCheckbox = document.getElementById("subscribed");
+            const subscribeLabel = document.querySelector("label[for='subscribed']");
+            const submitButton = document.querySelector("button[type='submit']");
+
+            if (number.trim() === "") {
+                statusDiv.textContent = "";
+                if (subscribeCheckbox) subscribeCheckbox.disabled = false;
+                return;
+            }
+
+            fetch(`/check-phone?number=${encodeURIComponent(number)}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exists) {
+                        statusDiv.textContent = messages[lang] || messages["en"];
+                        if (subscribeCheckbox) {
+                            subscribeCheckbox.hidden = true;
+                            subscribeLabel.hidden = true;
+                        }
+                        if (subscribeLabel) {
+                            subscribeLabel.textContent = {
+                                en: "I no longer want to receive alerts",
+                                es: "Ya no quiero recibir alertas",
+                                so: "Ma doonayo in aan sii helo digniino",
+                                ar: "لم أعد أرغب في تلقي التنبيهات",
+                                sw: "Sitaki tena kupokea arifa",
+                                fr: "Je ne souhaite plus recevoir d'alertes",
+                                rw: "Simfite inyota yo kwakira ubutumwa bwo kuburira",
+                                vi: "Tôi không muốn nhận cảnh báo nữa",
+                                ne: "अब म सूचना प्राप्त गर्न चाहन्न",
+                                te: "నేను ఇకపై హెచ్చరికలను పొందదలచుకోలేదు",
+                                tr: "Artık uyarı almak istemiyorum",
+                                ps: "زه نور خبرتیاوې نه غواړم"
+                            }[lang] || "I no longer want to receive alerts";
+                        }
+                        if (submitButton) {
+                            submitButton.textContent = {
+                                en: "Unsubscribe from Alerts",
+                                es: "Cancelar suscripción de alertas",
+                                so: "Ka jooji digniinta",
+                                ar: "إلغاء الاشتراك في التنبيهات",
+                                sw: "Jiondoe kwenye arifa",
+                                fr: "Se désabonner des alertes",
+                                rw: "Hagarika kwakira ubutumwa bwo kuburira",
+                                vi: "Hủy đăng ký cảnh báo",
+                                ne: "सूचना सदस्यता रद्द गर्नुहोस्",
+                                te: "హెచ్చరికల సభ్యత్వాన్ని రద్దు చేయండి",
+                                tr: "Uyarılardan çık",
+                                ps: "خبرتیاوې لغوه کړئ"
+                            }[lang] || "Unsubscribe from Alerts";
+                        }
+                    } else {
+                        statusDiv.textContent = "";
+                        if (subscribeCheckbox) {
+                            subscribeCheckbox.disabled = false;
+                            subscribeCheckbox.checked = true;
+                        }
+
+                        if (submitButton) {
+                            submitButton.textContent = {
+                                en: "Subscribe to Alerts",
+                                es: "Suscribirse a alertas",
+                                so: "Ku biir digniinta",
+                                ar: "اشترك في التنبيهات",
+                                sw: "Jiandikishe kwa arifa",
+                                fr: "S'abonner aux alertes",
+                                rw: "Iyandikishe ku butumwa bwo kuburira",
+                                vi: "Đăng ký cảnh báo",
+                                ne: "सूचना सदस्यता लिनुहोस्",
+                                te: "హెచ్చరికల కోసం సబ్స్క్రైబ్ చేయండి",
+                                tr: "Uyarılara abone ol",
+                                ps: "د خبرتیاوو لپاره ګډون وکړئ"
+                            }[lang] || "Subscribe to Alerts";
+                        }
+                    }
+                })
+                .catch(() => {
+                    statusDiv.textContent = "Error checking phone number.";
+                    if (subscribeCheckbox) subscribeCheckbox.disabled = false;
+                });
+        });
+    }
+});
+</script>
 </body>
 </html>
