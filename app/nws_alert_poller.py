@@ -33,11 +33,11 @@ NWS_API_ENDPOINT = "https://api.weather.gov/alerts/active"
 def get_db_connection():
     try:
         return psycopg2.connect(
-            dbname=os.getenv("POSTGRES_DB"),
-            user=os.getenv("POSTGRES_USER"),
-            password=os.getenv("POSTGRES_PASSWORD"),
-            host=os.getenv("POSTGRES_HOST", "localhost"),
-            port=os.getenv("POSTGRES_PORT", "5432")
+            dbname=os.getenv("POSTGRES_DB", "zorrito"),
+            user=os.getenv("POSTGRES_USER", "zorrito"),
+            password=os.getenv("POSTGRES_PASSWORD", "password"),
+            host=os.getenv("POSTGRES_HOST", "db"),
+            port=os.getenv("POSTGRES_PORT")
         )
     except Exception as e:
         logging.error(f"Database connection failed: {e}")
@@ -70,6 +70,10 @@ def poll_nws_alerts():
                 inserted = 0
                 for feature in features:
                     props = feature.get("properties", {})
+                    severity = props.get("severity")
+                    if severity not in {"Moderate", "Severe", "Extreme"}:
+                        continue
+
                     alert_id = feature.get("id")
                     area_desc = props.get("areaDesc", "")
                     onset = props.get("onset")
@@ -78,7 +82,6 @@ def poll_nws_alerts():
                     headline = props.get("headline")
                     description = props.get("description", "").encode("utf-8", errors="replace").decode("utf-8")
                     instruction = props.get("instruction")
-                    severity = props.get("severity")
                     certainty = props.get("certainty")
                     urgency = props.get("urgency")
                     sender = props.get("sender")
