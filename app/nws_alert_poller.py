@@ -21,6 +21,10 @@ app.conf.beat_schedule = {
         "task": "nws_alert_poller.refresh_user_alerts_view",
         "schedule": crontab(minute="*/2"),
     },
+    "prune-expired-alerts-daily": {
+        "task": "nws_alert_poller.prune_expired_alerts",
+        "schedule": crontab(hour=3, minute=30),
+    },
 }
 app.conf.timezone = "UTC"
 
@@ -111,6 +115,9 @@ def poll_nws_alerts():
                     for fips in fips_list:
                         cur.execute("INSERT INTO alert_fips (alert_id, fips) VALUES (%s, %s);", (alert_id, fips))
 
+                    delivery_time = datetime.utcnow()
+                    logging.info(f"Alert {alert_id} delivered at {delivery_time.isoformat()}")
+
                     inserted += 1
             conn.commit()
             logging.info(f"Inserted {inserted} new alerts into database.")
@@ -135,3 +142,15 @@ def refresh_user_alerts_view():
             logging.info(f"user_alerts_view refreshed at {datetime.utcnow().isoformat()}")
     except Exception as e:
         logging.error(f"Failed to refresh materialized view: {e}")
+
+@shared_task
+def prune_expired_alerts():
+    try:
+        with db_engine.begin() as conn:
+            result = conn.execute(text("""
+                DELETE FROM alerts
+                WHERE expires < (now() - interval '1 day')
+            """))
+            logging.info(f"Pruned {result.rowcount} expired alerts at {datetime.utcnow().isoformat()}")
+    except Exception as e:
+        logging.error(f"Error pruning expired alerts: {e}")
