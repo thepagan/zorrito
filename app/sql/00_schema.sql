@@ -51,6 +51,10 @@ CREATE TABLE IF NOT EXISTS alert_fips (
     PRIMARY KEY (alert_id, fips)
 );
 
+ALTER TABLE alert_fips
+ADD CONSTRAINT fk_alert_fips_county
+FOREIGN KEY (fips) REFERENCES county(fips) ON DELETE CASCADE;
+
 -- ALERT DELIVERY LOG
 CREATE TABLE IF NOT EXISTS alert_delivery (
     user_id INTEGER REFERENCES "user"(id) ON DELETE CASCADE,
@@ -59,6 +63,18 @@ CREATE TABLE IF NOT EXISTS alert_delivery (
     status TEXT,
     matched_at TIMESTAMP,
     PRIMARY KEY (user_id, alert_id)
+);
+
+-- TRANSLATIONS CACHE
+CREATE TABLE IF NOT EXISTS translations (
+    id SERIAL PRIMARY KEY,
+    alert_id TEXT REFERENCES alerts(id) ON DELETE CASCADE,
+    user_language VARCHAR(5) NOT NULL,
+    translated_headline TEXT,
+    translated_description TEXT,
+    translated_instruction TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(alert_id, user_language)
 );
 
 -- Index to speed up searching for alerts by FIPS or ID
@@ -114,3 +130,17 @@ CREATE INDEX IF NOT EXISTS idx_user_alerts_alert_id ON user_alerts_view(alert_id
 -- Composite index for efficient matching of users and alerts
 CREATE UNIQUE INDEX IF NOT EXISTS user_alerts_view_id_idx
 ON user_alerts_view(user_id, alert_id);
+
+-- View for translatable alerts
+DROP VIEW IF EXISTS translatable_alerts;
+CREATE VIEW translatable_alerts AS
+SELECT id, headline, description, instruction, severity
+FROM alerts
+WHERE severity = 'Extreme';
+
+-- Normalization table for alert event metadata
+CREATE TABLE IF NOT EXISTS alert_event (
+    event TEXT PRIMARY KEY,
+    category TEXT,
+    description TEXT
+);

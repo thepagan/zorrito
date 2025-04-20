@@ -237,3 +237,4 @@ training_data/
 training_data/*
 XX_seed_states.sql
 app/sql/02_faux_data.sql
+app/languages/lang_models/*

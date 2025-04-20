@@ -13,9 +13,10 @@ services:
       - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
       - TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER}
       - TWILIO_TEST_NUMBER=${TWILIO_TEST_NUMBER}
-      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
     volumes:
       - ./logs:/app/logs
+    restart: unless-stopped
 
   db:
     image: postgres:14
@@ -34,11 +35,15 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7
-    ports:
-      - "6379:6379"
+    expose:
+      - "6379"
+    restart: unless-stopped
+    networks:
+      - internal
 
   worker:
     build: ./app
@@ -47,10 +52,13 @@ services:
       - web
       - redis
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
     user: "nobody"
     volumes:
       - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - internal
 
   beat:
     build: ./app
@@ -59,11 +67,26 @@ services:
       - web
       - redis
     environment:
-      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_BROKER_URL=${CELERY_BROKER_URL}
     user: "nobody"
     volumes:
       - /tmp:/tmp
       - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - internal
+
+  libretranslate:
+    image: libretranslate/libretranslate
+    expose:
+      - "5000"
+    environment:
+      - LT_LOAD_ONLY=en,es,so,ar,fr,rw,vi,ne,te,tr,ps,sw,mai,ja,zh
+    restart: unless-stopped
 
 volumes:
   pgdata:
+
+networks:
+  internal:
+    driver: bridge
