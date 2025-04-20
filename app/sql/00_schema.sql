@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS alert_delivery (
     alert_id TEXT REFERENCES alerts(id) ON DELETE CASCADE,
     sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     status TEXT,
+    matched_at TIMESTAMP,
     PRIMARY KEY (user_id, alert_id)
 );
 

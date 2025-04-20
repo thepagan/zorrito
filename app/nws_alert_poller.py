@@ -5,35 +5,10 @@ from datetime import datetime
 import psycopg2
 from dotenv import load_dotenv
 from celery import Celery, shared_task
-from celery.schedules import crontab
 from sqlalchemy import create_engine, text
+from logging_config import configure_logging
 
-# Load environment variables
-load_dotenv()
-app = Celery("nws_alert_poller", broker=os.getenv("CELERY_BROKER_URL", "redis://localhost:6379/0"))
-
-app.conf.beat_schedule = {
-    "poll-nws-every-1-minute": {
-        "task": "nws_alert_poller.poll_nws_alerts",
-        "schedule": crontab(minute="*/1"),
-    },
-    "refresh-user-alerts-view-every-2-minutes": {
-        "task": "nws_alert_poller.refresh_user_alerts_view",
-        "schedule": crontab(minute="*/2"),
-    },
-    "prune-expired-alerts-daily": {
-        "task": "nws_alert_poller.prune_expired_alerts",
-        "schedule": crontab(hour=3, minute=30),
-    },
-}
-app.conf.timezone = "UTC"
-
-# Logging setup
-logging.basicConfig(
-    filename=os.getenv("ZORRITO_ALERT_LOG", "/tmp/zorrito_polling.log"),
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
+logger = configure_logging()
 
 # Constants
 NWS_API_ENDPOINT = "https://api.weather.gov/alerts/active"
@@ -49,7 +24,7 @@ def get_db_connection():
             port=os.getenv("POSTGRES_PORT")
         )
     except Exception as e:
-        logging.error(f"Database connection failed: {e}")
+        logger.error(f"Database connection failed: {e}")
         raise
 
 def fetch_active_alerts():
@@ -58,19 +33,19 @@ def fetch_active_alerts():
         response.raise_for_status()
         return response.json()
     except Exception as e:
-        logging.error(f"Failed to fetch NWS alerts: {e}")
+        logger.error(f"Failed to fetch NWS alerts: {e}")
         return None
 
-@app.task
+@shared_task
 def poll_nws_alerts():
-    logging.info("Starting NWS alert polling...")
+    logger.info("📡 Starting NWS alert polling...")
     data = fetch_active_alerts()
     if not data:
         return
 
     features = data.get("features", [])
     if not features:
-        logging.info("No active alerts found.")
+        logger.info("No active alerts found.")
         return
 
     try:
@@ -96,7 +71,10 @@ def poll_nws_alerts():
                     sender = props.get("sender")
                     sent = props.get("sent")
                     effective = props.get("effective")
-                    fips_list = [f for f in props.get("geocode", {}).get("FIPS6", []) if f.isdigit()]
+                    fips_list = props.get("geocode", {}).get("FIPS6", [])
+                    if not fips_list:
+                        fips_list = props.get("geocode", {}).get("SAME", [])
+                    fips_list = [f.lstrip("0") for f in fips_list if f.isdigit()]
 
                     # Check for duplicate alert ID
                     cur.execute("SELECT id FROM alerts WHERE id = %s;", (alert_id,))
@@ -116,14 +94,13 @@ def poll_nws_alerts():
                         cur.execute("INSERT INTO alert_fips (alert_id, fips) VALUES (%s, %s);", (alert_id, fips))
 
                     delivery_time = datetime.utcnow()
-                    logging.info(f"Alert {alert_id} delivered at {delivery_time.isoformat()}")
+                    logger.info(f"✅ Alert delivered\n• ID: {alert_id}\n• Event: {event}\n• Severity: {severity}\n• Time: {delivery_time.isoformat()}")
 
                     inserted += 1
             conn.commit()
-            logging.info(f"Inserted {inserted} new alerts into database.")
-            logging.debug(f"Poll completed at {datetime.utcnow().isoformat()} with {inserted} inserts.")
+            logger.info(f"📥 Inserted {inserted} new alerts into database at {datetime.utcnow().isoformat()}")
     except Exception as e:
-        logging.error(f"Error during database insert: {e}")
+        logger.error(f"Error during database insert: {e}")
 
 db_url = (
     f"postgresql+psycopg2://{os.getenv('POSTGRES_USER', 'zorrito')}:"
@@ -139,18 +116,39 @@ def refresh_user_alerts_view():
     try:
         with db_engine.begin() as conn:
             conn.execute(text("REFRESH MATERIALIZED VIEW CONCURRENTLY user_alerts_view"))
-            logging.info(f"user_alerts_view refreshed at {datetime.utcnow().isoformat()}")
+            logger.info(f"🔄 user_alerts_view refreshed at {datetime.utcnow().isoformat()}")
     except Exception as e:
-        logging.error(f"Failed to refresh materialized view: {e}")
+        logger.error(f"Failed to refresh materialized view: {e}")
 
 @shared_task
 def prune_expired_alerts():
     try:
         with db_engine.begin() as conn:
-            result = conn.execute(text("""
+            delivery_result = conn.execute(text("""
+                DELETE FROM alert_delivery
+                WHERE alert_id IN (
+                    SELECT id FROM alerts WHERE expires < (now() - interval '1 day')
+                ) AND sent_at IS NOT NULL
+            """))
+
+            fips_result = conn.execute(text("""
+                DELETE FROM alert_fips
+                WHERE alert_id IN (
+                    SELECT id FROM alerts WHERE expires < (now() - interval '1 day')
+                )
+            """))
+
+            alerts_result = conn.execute(text("""
                 DELETE FROM alerts
                 WHERE expires < (now() - interval '1 day')
             """))
-            logging.info(f"Pruned {result.rowcount} expired alerts at {datetime.utcnow().isoformat()}")
+
+            logger.info(
+                f"🧹 Pruned expired alerts at {datetime.utcnow().isoformat()}:\n"
+                f"• alert_delivery: {delivery_result.rowcount}\n"
+                f"• alert_fips: {fips_result.rowcount}\n"
+                f"• alerts: {alerts_result.rowcount}"
+            )
+
     except Exception as e:
-        logging.error(f"Error pruning expired alerts: {e}")
+        logger.error(f"Error pruning expired alerts: {e}")

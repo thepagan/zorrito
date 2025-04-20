@@ -1,8 +1,41 @@
+function applyThemeStyles(theme) {
+  const isDark = theme === "dark";
+
+  document.documentElement.style.setProperty('--bg-color', isDark ? '#121212' : '#ffffff');
+  document.documentElement.style.setProperty('--text-color', isDark ? '#f1f1f1' : '#000000');
+  document.documentElement.style.setProperty('--accent-color', isDark ? '#66aaff' : '#0066cc');
+
+  document.querySelectorAll('.themed-form').forEach(el => {
+    el.style.backgroundColor = isDark ? '#1e1e1e' : '#ffffff';
+    el.style.color = isDark ? '#f1f1f1' : '#000000';
+  });
+
+  document.querySelectorAll('label').forEach(label => {
+    label.style.color = isDark ? '#f1f1f1' : '#000000';
+  });
+
+  const header = document.querySelector('[data-i18n="title"]');
+  if (header) header.style.color = isDark ? '#f1f1f1' : '#000000';
+
+  document.querySelectorAll('.themed-input').forEach(el => {
+    el.style.backgroundColor = isDark ? '#2a2a2a' : '#ffffff';
+    el.style.color = isDark ? '#f1f1f1' : '#000000';
+    el.style.borderColor = isDark ? '#555' : '#ccc';
+  });
+
+  document.querySelectorAll('.btn-primary').forEach(el => {
+    el.style.backgroundColor = isDark ? '#333' : '#007bff';
+    el.style.color = isDark ? '#fff' : '#ffffff';
+    el.style.border = 'none';
+  });
+}
+
 function toggleTheme() {
   const current = document.documentElement.getAttribute("data-theme") || "light";
   const newTheme = current === "dark" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", newTheme);
   localStorage.setItem("zorrito-theme", newTheme);
+  applyThemeStyles(newTheme);
 }
 
 async function loadCounties() {
@@ -28,15 +61,19 @@ window.toggleTheme = toggleTheme;
 window.loadCounties = loadCounties;
 
 window.addEventListener('DOMContentLoaded', () => {
-  if (!window.matchMedia('(prefers-color-scheme)').media !== 'not all') {
-    const hour = new Date().getHours();
-    const darkMode = hour < 6 || hour >= 18;
-    if (darkMode) {
-      document.documentElement.style.setProperty('--bg-color', '#121212');
-      document.documentElement.style.setProperty('--text-color', '#f1f1f1');
-      document.documentElement.style.setProperty('--accent-color', '#66aaff');
+  let theme = localStorage.getItem("zorrito-theme");
+
+  // If no saved preference, detect system preference
+  if (!theme) {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      theme = "dark";
+    } else {
+      theme = "light";
     }
   }
+
+  document.documentElement.setAttribute("data-theme", theme);
+  applyThemeStyles(theme);
 
   const translations = {
     en: {
@@ -46,7 +83,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "County",
       "language_label": "Language",
       "subscribe_label": "I want to receive alerts",
-      "submit_btn": "Register",
+      "submit_btn": "Subscribe to Alerts",
       "theme_btn": "Toggle Theme",
       "unsubscribe_label": "I no longer want to receive alerts",
       "unsubscribe_btn": "Unsubscribe from Alerts"
@@ -58,7 +95,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "Condado",
       "language_label": "Idioma",
       "subscribe_label": "Deseo recibir alertas",
-      "submit_btn": "Registrarme",
+      "submit_btn": "Suscribirse a alertas",
       "theme_btn": "Cambiar Tema",
       "unsubscribe_label": "Ya no quiero recibir alertas",
       "unsubscribe_btn": "Darse de baja de Alertas"
@@ -70,7 +107,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "Degmo",
       "language_label": "Luuqad",
       "subscribe_label": "Waxaan rabaa in aan helo digniino",
-      "submit_btn": "Diiwaangeli",
+      "submit_btn": "Ku biir digniinta",
       "theme_btn": "Beddel Mowduuca",
       "unsubscribe_label": "Ma rabto in aan helo digniino",
       "unsubscribe_btn": "Ka bax digniino"
@@ -82,7 +119,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "المقاطعة",
       "language_label": "اللغة",
       "subscribe_label": "أرغب في تلقي التنبيهات",
-      "submit_btn": "سجل",
+      "submit_btn": "اشترك في التنبيهات",
       "theme_btn": "تبديل السمة",
       "unsubscribe_label": "لم أعد أرغب في تلقي التنبيهات",
       "unsubscribe_btn": "إلغاء الاشتراك في التنبيهات"
@@ -94,7 +131,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "Kaunti",
       "language_label": "Lugha",
       "subscribe_label": "Ningependa kupokea tahadhari",
-      "submit_btn": "Jisajili",
+      "submit_btn": "Jiandikishe kwa arifa",
       "theme_btn": "Badilisha Mandhari",
       "unsubscribe_label": "Sitaki kupokea tahadhari tena",
       "unsubscribe_btn": "Jiondoe kwenye Tahadhari"
@@ -106,7 +143,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "Comté",
       "language_label": "Langue",
       "subscribe_label": "Je souhaite recevoir des alertes",
-      "submit_btn": "S'inscrire",
+      "submit_btn": "S'abonner aux alertes",
       "theme_btn": "Changer de Thème",
       "unsubscribe_label": "Je ne veux plus recevoir d'alertes",
       "unsubscribe_btn": "Se désinscrire des alertes"
@@ -118,7 +155,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "Akarere",
       "language_label": "Ururimi",
       "subscribe_label": "Ndashaka kwakira amakuru y'uburira",
-      "submit_btn": "Iyandikishe",
+      "submit_btn": "Iyandikishe ku butumwa bwo kuburira",
       "theme_btn": "Hindura insanganyamatsiko",
       "unsubscribe_label": "Sinshaka kwakira amakuru y'uburira",
       "unsubscribe_btn": "Kuvana mu burira"
@@ -130,7 +167,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "Quận",
       "language_label": "Ngôn ngữ",
       "subscribe_label": "Tôi muốn nhận cảnh báo",
-      "submit_btn": "Đăng ký",
+      "submit_btn": "Đăng ký cảnh báo",
       "theme_btn": "Chuyển Giao Diện",
       "unsubscribe_label": "Tôi không muốn nhận cảnh báo nữa",
       "unsubscribe_btn": "Hủy đăng ký nhận cảnh báo"
@@ -142,7 +179,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "जिल्ला",
       "language_label": "भाषा",
       "subscribe_label": "म सूचना प्राप्त गर्न चाहन्छु",
-      "submit_btn": "दर्ता गर्नुहोस्",
+      "submit_btn": "सूचना सदस्यता लिनुहोस्",
       "theme_btn": "थिम परिवर्तन गर्नुहोस्",
       "unsubscribe_label": "म अब सूचना प्राप्त गर्न चाहन्न",
       "unsubscribe_btn": "सूचनाबाट बाहिर निस्कनुहोस्"
@@ -154,7 +191,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "జిల్లా",
       "language_label": "భాష",
       "subscribe_label": "నేను హెచ్చరికలు అందుకోవాలనుకుంటున్నాను",
-      "submit_btn": "నమోదు చేయండి",
+      "submit_btn": "హెచ్చరికల కోసం సబ్స్క్రైబ్ చేయండి",
       "theme_btn": "థీమ్ మార్చండి",
       "unsubscribe_label": "నేను ఇక హెచ్చరికలు అందుకోవడం కోరుకోను",
       "unsubscribe_btn": "హెచ్చరికల నుండి అన్‌సబ్ చేయండి"
@@ -166,7 +203,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "İlçe",
       "language_label": "Dil",
       "subscribe_label": "Uyarılar almak istiyorum",
-      "submit_btn": "Kaydol",
+      "submit_btn": "Uyarılara abone ol",
       "theme_btn": "Temayı Değiştir",
       "unsubscribe_label": "Artık uyarı almak istemiyorum",
       "unsubscribe_btn": "Uyarılardan Çık"
@@ -178,7 +215,7 @@ window.addEventListener('DOMContentLoaded', () => {
       "county_label": "ولسوالۍ",
       "language_label": "ژبه",
       "subscribe_label": "زه غواړم چې خبرداری ترلاسه کړم",
-      "submit_btn": "راجستر",
+      "submit_btn": "د خبرتیاوو لپاره ګډون وکړئ",
       "theme_btn": "تیم بدل کړئ",
       "unsubscribe_label": "زه نور خبرداری نه غواړم",
       "unsubscribe_btn": "د خبرداریو نه ځان خلاص کړئ"
@@ -292,4 +329,25 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 
   window.showPhoneExistsWarning = showPhoneExistsWarning;
+
+  const logBox = document.getElementById("log-box");
+  async function fetchLogs() {
+    try {
+      const res = await fetch("/logs/recent");
+      if (!res.ok) throw new Error("Network response was not ok");
+      const data = await res.json();
+      if (logBox) {
+        logBox.textContent = data.log.join("\n");
+        logBox.scrollTop = logBox.scrollHeight;
+      }
+    } catch (err) {
+      console.error("Failed to fetch logs:", err);
+      if (logBox) {
+        logBox.textContent = "⚠️ Error fetching logs.";
+      }
+    }
+  }
+
+  setInterval(fetchLogs, 5000);
+  fetchLogs(); // initial load
 });

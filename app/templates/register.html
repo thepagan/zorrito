@@ -14,7 +14,9 @@
     </button>
 </div>
 <div class="container mt-5">
-    <div class="card shadow themed-form">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card shadow themed-form">
         <div class="card-body">
             <h2 class="card-title text-center" data-i18n="title">🦊 Registro de Alertas</h2>
             <form method="POST">
@@ -63,7 +65,7 @@
                         <option value="ps">پښتو</option>
                     </select>
                 </div>
-                <div class="form-check mb-3">
+                <div class="form-check mb-3" hidden>
                     <input class="form-check-input themed-input" type="checkbox" value="1" name="subscribed" id="subscribed" {% if subscribed %}checked{% endif %}>
                     <label class="form-check-label" for="subscribed" data-i18n="subscribe_label">
                         Deseo recibir alertas
@@ -84,9 +86,21 @@
                 {% endif %}
                 <button type="submit" class="btn btn-primary w-100" data-i18n="submit_btn">Registrarme</button>
             </form>
+            </div>
         </div>
-    </div>
-</div>
+            </div>
+        <div class="col-md-6">
+            <div class="card shadow themed-form">
+                <div class="card-body">
+                    <h5 class="card-title" data-i18n="log_title">System Log Data</h5>
+                    <pre id="log-box" class="bg-dark text-light p-3 rounded" style="max-height: 30em; overflow-y: scroll; font-size: 0.8rem; line-height: 1.2em; white-space: pre-wrap; word-break: break-word;">
+                    <code></code>
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </div> <!-- close .row -->
+</div> <!-- close .container -->
 <script>
 document.addEventListener("DOMContentLoaded", function () {
     const phoneInput = document.getElementById("phone_number");
@@ -114,6 +128,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const subscribeCheckbox = document.getElementById("subscribed");
             const subscribeLabel = document.querySelector("label[for='subscribed']");
             const submitButton = document.querySelector("button[type='submit']");
+            const stateField = document.getElementById("state");
+            const fipsField = document.getElementById("fips");
 
             if (number.trim() === "") {
                 statusDiv.textContent = "";
@@ -129,6 +145,21 @@ document.addEventListener("DOMContentLoaded", function () {
                         if (subscribeCheckbox) {
                             subscribeCheckbox.hidden = true;
                             subscribeLabel.hidden = true;
+                        }
+                        if (stateField) {
+                            stateField.required = false;
+                            stateField.closest('.mb-3').style.display = 'none';
+                            if (stateField.previousElementSibling) {
+                                stateField.previousElementSibling.style.display = 'none';
+                            }
+                        }
+
+                        if (fipsField) {
+                            fipsField.required = false;
+                            fipsField.closest('.mb-3').style.display = 'none';
+                            if (fipsField.previousElementSibling) {
+                                fipsField.previousElementSibling.style.display = 'none';
+                            }
                         }
                         if (subscribeLabel) {
                             subscribeLabel.textContent = {
@@ -169,6 +200,21 @@ document.addEventListener("DOMContentLoaded", function () {
                             subscribeCheckbox.checked = true;
                         }
 
+                        if (stateField) {
+                            stateField.required = true;
+                            stateField.closest('.mb-3').style.display = '';
+                            if (stateField.previousElementSibling) {
+                                stateField.previousElementSibling.style.display = '';
+                            }
+                        }
+
+                        if (fipsField) {
+                            fipsField.required = true;
+                            fipsField.closest('.mb-3').style.display = '';
+                            if (fipsField.previousElementSibling) {
+                                fipsField.previousElementSibling.style.display = '';
+                            }
+                        }
                         if (submitButton) {
                             submitButton.textContent = {
                                 en: "Subscribe to Alerts",

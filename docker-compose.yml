@@ -1,25 +1,39 @@
 services:
   web:
     build: ./app
+    env_file: .env
     ports:
       - "8181:8181"
+    command: sh -c "until pg_isready -h db -U zorrito; do sleep 1; done; python3 && gunicorn main:app --bind 0.0.0.0:8181"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     environment:
       - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID}
       - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN}
       - TWILIO_FROM_NUMBER=${TWILIO_FROM_NUMBER}
       - TWILIO_TEST_NUMBER=${TWILIO_TEST_NUMBER}
       - CELERY_BROKER_URL=redis://redis:6379/0
+    volumes:
+      - ./logs:/app/logs
 
   db:
     image: postgres:14
+    env_file: .env
     environment:
-      POSTGRES_USER: zorrito
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: zorrito
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./app/sql:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zorrito"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
@@ -28,17 +42,19 @@ services:
 
   worker:
     build: ./app
-    command: celery -A nws_alert_poller worker --loglevel=info
+    command: celery -A celery_scheduler worker --loglevel=info
     depends_on:
       - web
       - redis
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
     user: "nobody"
+    volumes:
+      - ./logs:/app/logs
 
   beat:
     build: ./app
-    command: celery -A nws_alert_poller beat --loglevel=info --schedule=/tmp/celerybeat-schedule
+    command: celery -A celery_scheduler beat --loglevel=info --schedule=/tmp/celerybeat-schedule
     depends_on:
       - web
       - redis
@@ -47,6 +63,7 @@ services:
     user: "nobody"
     volumes:
       - /tmp:/tmp
+      - ./logs:/app/logs
 
 volumes:
   pgdata:

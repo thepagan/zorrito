@@ -233,3 +233,7 @@ Temporary Items
 # End of https://www.toptal.com/developers/gitignore/api/macos
 
 .env
+training_data/
+training_data/*
+XX_seed_states.sql
+app/sql/02_faux_data.sql

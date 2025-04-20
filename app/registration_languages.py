@@ -8,7 +8,14 @@ registration_translations = {
         "subscribe_label": "Subscribe to alerts",
         "submit_button": "Subscribe to Alerts",
         "thank_you": "🦊 Zorrito has successfully registered you!",
-        "unsubscribed": "🦊 You have been unsubscribed from alerts."
+        "unsubscribed": "🦊 You have been unsubscribed from alerts.",
+        "welcome_sms": "Thank you for registering for alerts.",
+        "goodbye_sms": "You have been unsubscribed from alerts.",
+        "already_unsubscribed": "🦊 You’re already unsubscribed from Zorrito alerts.",
+        "already_subscribed": "🦊 You’re already subscribed to Zorrito alerts.",
+        "resubscribe_tip": "Reply START to rejoin.",
+        "unknown_command": "🦊 Reply STOP to unsubscribe or START to subscribe.",
+        "not_found": "🦊 Sorry, we couldn't find your number in our system."
     },
     "es": {
         "title": "Registro de Zorrito",
@@ -19,7 +26,14 @@ registration_translations = {
         "subscribe_label": "Suscribirse a alertas",
         "submit_button": "Suscribirse a alertas",
         "thank_you": "🦊 ¡Zorrito te ha registrado exitosamente!",
-        "unsubscribed": "🦊 Has sido dado de baja de las alertas."
+        "unsubscribed": "🦊 Has sido dado de baja de las alertas.",
+        "welcome_sms": "Gracias por registrarte para recibir alertas.",
+        "goodbye_sms": "Te has dado de baja de las alertas.",
+        "already_unsubscribed": "🦊 Ya no estás suscrito a las alertas de Zorrito.",
+        "already_subscribed": "🦊 Ya estás suscrito a las alertas de Zorrito.",
+        "resubscribe_tip": "Responde START para volver a unirte.",
+        "unknown_command": "🦊 Responde STOP para cancelar o START para suscribirte.",
+        "not_found": "🦊 No pudimos encontrar tu número en nuestro sistema."
     },
     "so": {
         "title": "Diiwaangelinta Zorrito",
@@ -30,7 +44,14 @@ registration_translations = {
         "subscribe_label": "Isdiiwaangeli digniinaha",
         "submit_button": "Ku biir digniinta",
         "thank_you": "🦊 Zorrito si guul leh ayuu kuu diiwaangeliyay!",
-        "unsubscribed": "🦊 Waxaad ka baxday digniinaha."
+        "unsubscribed": "🦊 Waxaad ka baxday digniinaha.",
+        "welcome_sms": "Waad iska diiwaangelisay digniinaha.",
+        "goodbye_sms": "Waad ka baxday digniinaha.",
+        "already_unsubscribed": "🦊 Hore ayaad uga baxday digniinaha Zorrito.",
+        "already_subscribed": "🦊 Hore ayaad ugu jirtay digniinaha Zorrito.",
+        "resubscribe_tip": "Ku noqo adigoo qoraya START.",
+        "unknown_command": "🦊 Qor STOP si aad uga baxdo ama START si aad ugu biirto.",
+        "not_found": "🦊 Lama helin lambarkaaga nidaamkayaga."
     },
     "ar": {
         "title": "تسجيل زوريتو",
@@ -41,7 +62,14 @@ registration_translations = {
         "subscribe_label": "الاشتراك في التنبيهات",
         "submit_button": "اشترك في التنبيهات",
         "thank_you": "🦊 تم تسجيلك بنجاح بواسطة زوريتو!",
-        "unsubscribed": "🦊 لقد ألغيت اشتراكك في التنبيهات."
+        "unsubscribed": "🦊 لقد ألغيت اشتراكك في التنبيهات.",
+        "welcome_sms": "شكرًا لتسجيلك في التنبيهات.",
+        "goodbye_sms": "لقد ألغيت اشتراكك في التنبيهات.",
+        "already_unsubscribed": "🦊 أنت بالفعل غير مشترك في تنبيهات زوريتو.",
+        "already_subscribed": "🦊 أنت بالفعل مشترك في تنبيهات زوريتو.",
+        "resubscribe_tip": "أرسل START للاشتراك مجددًا.",
+        "unknown_command": "🦊 أرسل STOP لإلغاء الاشتراك أو START للاشتراك.",
+        "not_found": "🦊 لم نتمكن من العثور على رقمك في نظامنا."
     },
     "sw": {
         "title": "Usajili wa Zorrito",
@@ -52,7 +80,14 @@ registration_translations = {
         "subscribe_label": "Jisajili kwa arifa",
         "submit_button": "Jiandikishe kwa arifa",
         "thank_you": "🦊 Zorrito amekusajili kwa mafanikio!",
-        "unsubscribed": "🦊 Umejiondoa kutoka kwa tahadhari."
+        "unsubscribed": "🦊 Umejiondoa kutoka kwa tahadhari.",
+        "welcome_sms": "Asante kwa kujisajili kwa arifa.",
+        "goodbye_sms": "Umejiondoa kutoka kwa arifa.",
+        "already_unsubscribed": "🦊 Tayari umejiondoa kutoka kwa tahadhari za Zorrito.",
+        "already_subscribed": "🦊 Tayari umejiandikisha kwa tahadhari za Zorrito.",
+        "resubscribe_tip": "Jibu START kujiunga tena.",
+        "unknown_command": "🦊 Jibu STOP ili kujiondoa au START kujiandikisha.",
+        "not_found": "🦊 Hatukuweza kupata nambari yako katika mfumo wetu."
     },
     "fr": {
         "title": "Inscription Zorrito",
@@ -63,7 +98,14 @@ registration_translations = {
         "subscribe_label": "S'abonner aux alertes",
         "submit_button": "S'abonner aux alertes",
         "thank_you": "🦊 Zorrito vous a inscrit avec succès !",
-        "unsubscribed": "🦊 Vous vous êtes désinscrit des alertes."
+        "unsubscribed": "🦊 Vous vous êtes désinscrit des alertes.",
+        "welcome_sms": "Merci de vous être inscrit aux alertes.",
+        "goodbye_sms": "Vous vous êtes désabonné des alertes.",
+        "already_unsubscribed": "🦊 Vous êtes déjà désinscrit des alertes Zorrito.",
+        "already_subscribed": "🦊 Vous êtes déjà inscrit aux alertes Zorrito.",
+        "resubscribe_tip": "Répondez START pour vous réabonner.",
+        "unknown_command": "🦊 Répondez STOP pour vous désabonner ou START pour vous abonner.",
+        "not_found": "🦊 Nous n'avons pas trouvé votre numéro dans notre système."
     },
     "rw": {
         "title": "Kwiyandikisha kwa Zorrito",
@@ -74,7 +116,14 @@ registration_translations = {
         "subscribe_label": "Iyandikishe kubimenyesha",
         "submit_button": "Iyandikishe ku butumwa bwo kuburira",
         "thank_you": "🦊 Zorrito yakwanditse neza!",
-        "unsubscribed": "🦊 Wavanye mu burira."
+        "unsubscribed": "🦊 Wavanye mu burira.",
+        "welcome_sms": "Urakoze kwiyandikisha ku butumwa bwo kuburira.",
+        "goodbye_sms": "Wavanywe mu butumwa bwo kuburira.",
+        "already_unsubscribed": "🦊 Wasanzwe utacyakira ubutumwa bwa Zorrito.",
+        "already_subscribed": "🦊 Usanzwe wiyandikishije ku butumwa bwa Zorrito.",
+        "resubscribe_tip": "Sohora START wongere wiyandikishe.",
+        "unknown_command": "🦊 Sohora STOP wiyandikishe cyangwa START wongere wiyandikishe.",
+        "not_found": "🦊 Ntabwo twabashije kubona numero yawe muri sisiteme yacu."
     },
     "vi": {
         "title": "Đăng ký Zorrito",
@@ -85,7 +134,14 @@ registration_translations = {
         "subscribe_label": "Đăng ký nhận cảnh báo",
         "submit_button": "Đăng ký cảnh báo",
         "thank_you": "🦊 Zorrito đã đăng ký thành công cho bạn!",
-        "unsubscribed": "🦊 Bạn đã hủy đăng ký nhận cảnh báo."
+        "unsubscribed": "🦊 Bạn đã hủy đăng ký nhận cảnh báo.",
+        "welcome_sms": "Cảm ơn bạn đã đăng ký nhận cảnh báo.",
+        "goodbye_sms": "Bạn đã hủy đăng ký nhận cảnh báo.",
+        "already_unsubscribed": "🦊 Bạn đã hủy đăng ký nhận cảnh báo Zorrito.",
+        "already_subscribed": "🦊 Bạn đã đăng ký nhận cảnh báo Zorrito.",
+        "resubscribe_tip": "Trả lời START để đăng ký lại.",
+        "unknown_command": "🦊 Trả lời STOP để hủy hoặc START để đăng ký.",
+        "not_found": "🦊 Chúng tôi không thể tìm thấy số của bạn trong hệ thống."
     },
     "ne": {
         "title": "Zorrito दर्ता",
@@ -96,7 +152,14 @@ registration_translations = {
         "subscribe_label": "चेतावनीहरूको लागि सदस्यता लिनुहोस्",
         "submit_button": "सूचना सदस्यता लिनुहोस्",
         "thank_you": "🦊 Zorrito ले तपाईंलाई सफलतापूर्वक दर्ता गर्‍यो!",
-        "unsubscribed": "🦊 तपाईं सूचना प्राप्त गर्नबाट हट्नु भयो।"
+        "unsubscribed": "🦊 तपाईं सूचना प्राप्त गर्नबाट हट्नु भयो।",
+        "welcome_sms": "सूचनाहरूको लागि दर्ता गर्नु भएकोमा धन्यवाद।",
+        "goodbye_sms": "तपाईं अब सूचना प्राप्त गर्नुहुन्न।",
+        "already_unsubscribed": "🦊 तपाईं पहिले नै सूचना सदस्यता हटाउनुभएको छ।",
+        "already_subscribed": "🦊 तपाईं पहिले नै सूचना सदस्यता लिनुभएको छ।",
+        "resubscribe_tip": "पुन: सदस्यता लिन START पठाउनुहोस्।",
+        "unknown_command": "🦊 सदस्यता हटाउन STOP वा सदस्यता लिन START पठाउनुहोस्।",
+        "not_found": "🦊 हामी तपाईंको नम्बर फेला पार्न सकिएनौं।"
     },
     "te": {
         "title": "Zorrito నమోదు",
@@ -107,7 +170,14 @@ registration_translations = {
         "subscribe_label": "అలర్ట్‌ల కోసం సబ్‌స్క్రైబ్ చేయండి",
         "submit_button": "హెచ్చరికల కోసం సబ్స్క్రైబ్ చేయండి",
         "thank_you": "🦊 Zorrito మిమ్మల్ని విజయవంతంగా నమోదు చేసింది!",
-        "unsubscribed": "🦊 మీరు హెచ్చరికల నుండి తొలగించబడ్డారు."
+        "unsubscribed": "🦊 మీరు హెచ్చరికల నుండి తొలగించబడ్డారు.",
+        "welcome_sms": "హెచ్చరికల కోసం మీరు నమోదు చేసుకున్నందుకు ధన్యవాదాలు.",
+        "goodbye_sms": "మీరు హెచ్చరికల నుండి తొలగించబడ్డారు.",
+        "already_unsubscribed": "🦊 మీరు ఇప్పటికే హెచ్చరికల నుండి తొలగించబడ్డారు.",
+        "already_subscribed": "🦊 మీరు ఇప్పటికే హెచ్చరికలకు సబ్‌స్క్రైబ్ అయ్యారు.",
+        "resubscribe_tip": "మళ్ళీ చేరడానికి START పంపండి.",
+        "unknown_command": "🦊 నిష్క్రమించడానికి STOP లేదా చేరడానికి START పంపండి.",
+        "not_found": "🦊 మీ నంబర్‌ను మా వ్యవస్థలో కనుగొనలేకపోయాము."
     },
     "tr": {
         "title": "Zorrito Kaydı",
@@ -118,7 +188,14 @@ registration_translations = {
         "subscribe_label": "Uyarılar için abone ol",
         "submit_button": "Uyarılara abone ol",
         "thank_you": "🦊 Zorrito sizi başarıyla kaydetti!",
-        "unsubscribed": "🦊 Uyarı aboneliğiniz iptal edildi."
+        "unsubscribed": "🦊 Uyarı aboneliğiniz iptal edildi.",
+        "welcome_sms": "Uyarılar için kaydolduğunuz için teşekkürler.",
+        "goodbye_sms": "Uyarı aboneliğiniz iptal edildi.",
+        "already_unsubscribed": "🦊 Zorrito uyarı aboneliğiniz zaten iptal edilmiş.",
+        "already_subscribed": "🦊 Zorrito uyarılarına zaten abonesiniz.",
+        "resubscribe_tip": "Tekrar abone olmak için START yazın.",
+        "unknown_command": "🦊 Abonelik iptali için STOP, abone olmak için START yazın.",
+        "not_found": "🦊 Numaranız sistemimizde bulunamadı."
     },
     "ps": {
         "title": "د زوريتو ثبت",
@@ -129,6 +206,13 @@ registration_translations = {
         "subscribe_label": "د خبرتیاوو لپاره ګډون وکړئ",
         "submit_button": "د خبرتیاوو لپاره ګډون وکړئ",
         "thank_you": "🦊 زوريتو تاسو په بریالیتوب سره ثبت کړی یاست!",
-        "unsubscribed": "🦊 تاسو نور د خبرتیاوو ګډون نه لرئ."
+        "unsubscribed": "🦊 تاسو نور د خبرتیاوو ګډون نه لرئ.",
+        "welcome_sms": "د خبرتیاوو لپاره ستاسو د ګډون څخه مننه.",
+        "goodbye_sms": "تاسو نور د خبرتیاوو ګډون نه لرئ.",
+        "already_unsubscribed": "🦊 تاسو مخکې له دې له خبرتیاوو څخه لغوه شوی یاست.",
+        "already_subscribed": "🦊 تاسو مخکې له دې د خبرتیاوو ګډون کړی یاست.",
+        "resubscribe_tip": "د بیا ګډون لپاره START واستوئ.",
+        "unknown_command": "🦊 د لغوه کولو لپاره STOP او د ګډون لپاره START واستوئ.",
+        "not_found": "🦊 موږ ستاسو شمېره زموږ په سیسټم کې ونه موندله."
     }
 }

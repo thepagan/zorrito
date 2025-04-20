@@ -117,3 +117,26 @@ textarea:focus {
   border-color: var(--accent-color);
   outline: 2px solid var(--accent-color);
 }
+
+/* Two-column layout for form and logs */
+@media (min-width: 768px) {
+  .row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .col-md-6 {
+    flex: 1;
+  }
+
+  #log-box {
+    max-height: 50em;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.9rem;
+    padding: 1em;
+  }
+}
